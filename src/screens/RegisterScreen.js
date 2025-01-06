@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { View, StyleSheet, Alert, ScrollView, KeyboardAvoidingView, Platform, TouchableOpacity } from 'react-native';
+import { View, StyleSheet, Alert, ScrollView, KeyboardAvoidingView, Platform, TouchableOpacity, Text } from 'react-native';
 import InputField from '../components/InputField';
 import Button from '../components/Button';
 import useFormHandler from '../hooks/UseFormHandler';
@@ -27,10 +27,10 @@ const RegisterScreen = ({ navigation }) => {
     const isValid = validate({
       firstName: { required: true },
       lastName: { required: true },
-      mobileNo: { required: true },
+      mobileNo: { required: true, numeric: true },
       email: { required: true, email: true }, // Add email validation
-      password: { required: true, minLength: 8 }, // Password must be at least 8 characters
-      reenterPassword: { required: true },
+      password: { required: true }, // Password validation is handled inside validate
+      reenterPassword: { required: true, match: 'password' }, // Ensure it matches 'password'
     });
   
     if (!isValid) return;
@@ -42,15 +42,10 @@ const RegisterScreen = ({ navigation }) => {
       return;
     }
   
-    // Check if passwords match
-    if (values.password !== values.reenterPassword) {
-      Alert.alert('Error', 'Passwords do not match');
-      return;
-    }
-  
     Alert.alert('Registration Successful');
     navigation.navigate('Login');
   };
+  
   
 
   return (
@@ -90,46 +85,54 @@ const RegisterScreen = ({ navigation }) => {
             error={errors.email}
             style={styles.input}
           />
-          <View style={styles.passwordContainer}>
-            <InputField
-              label="Password"
-              secureTextEntry={!isPasswordVisible}
-              value={values.password}
-              onChangeText={(value) => handleChange('password', value)}
-              error={errors.password}
-              style={styles.input}
-            />
-            <TouchableOpacity
-                        style={styles.iconContainer}
-                        onPress={() => setIsPasswordVisible((prev) => !prev)}
-                      >
-                        <Ionicons
-                          name={isPasswordVisible ? 'eye' : 'eye-off'}
-                          size={24}
-                          color="gray"
-                        />
-            </TouchableOpacity>
-          </View>
-          <View style={styles.passwordContainer}>
-            <InputField
-              label="Re-enter Password"
-              secureTextEntry={!isReenterPasswordVisible}
-              value={values.reenterPassword}
-              onChangeText={(value) => handleChange('reenterPassword', value)}
-              error={errors.reenterPassword}
-              style={styles.input}
-            />
-            <TouchableOpacity
-              style={styles.iconContainer}
-                onPress={() => setIsReenterPasswordVisible((prev) => !prev)}
-                >
-                <Ionicons
-                  name={isReenterPasswordVisible ? 'eye' : 'eye-off'}
-                  size={24}
-                  color="gray"
-                />
-            </TouchableOpacity>
-          </View>
+          <View>
+  <View style={styles.passwordContainer}>
+    <InputField
+      label="Password"
+      secureTextEntry={!isPasswordVisible}
+      value={values.password}
+      onChangeText={(value) => handleChange('password', value)}
+      style={styles.input}
+    />
+    <TouchableOpacity
+      style={styles.iconContainer}
+      onPress={() => setIsPasswordVisible((prev) => !prev)}
+    >
+      <Ionicons
+        name={isPasswordVisible ? 'eye' : 'eye-off'}
+        size={24}
+        color="gray"
+      />
+    </TouchableOpacity>
+  </View>
+  {errors.password && <Text style={styles.errorText}>{errors.password}</Text>}
+</View>
+
+<View>
+  <View style={styles.passwordContainer}>
+    <InputField
+      label="Re-enter Password"
+      secureTextEntry={!isReenterPasswordVisible}
+      value={values.reenterPassword}
+      onChangeText={(value) => handleChange('reenterPassword', value)}
+      style={styles.input}
+    />
+    <TouchableOpacity
+      style={styles.iconContainer}
+      onPress={() => setIsReenterPasswordVisible((prev) => !prev)}
+    >
+      <Ionicons
+        name={isReenterPasswordVisible ? 'eye' : 'eye-off'}
+        size={24}
+        color="gray"
+      />
+    </TouchableOpacity>
+  </View>
+  {errors.reenterPassword && (
+    <Text style={styles.errorText}>{errors.reenterPassword}</Text>
+  )}
+</View>
+
           <Button 
             title="Register" 
             onPress={handleRegister}
@@ -151,31 +154,36 @@ const styles = StyleSheet.create({
     paddingBottom: 20, // Ensure there's space at the bottom to prevent cut-off when keyboard is open
   },
   boxContainer: {
-    backgroundColor: '#ffffff',
+    backgroundColor: '#E8E8E8',
     borderRadius: 8,
     padding: 16,
     opacity: 0.8,
     marginHorizontal: 16, // Add margin for spacing around the box
   },
-  input: {
-    height: 50,
-    borderWidth: 1,
-    borderColor: '#ccc',
-    borderRadius: 8,
-    paddingLeft: 10, // Increase padding to avoid overlap with icon
-    paddingRight: 40, // Add padding for the password icon
-    fontSize: 16,
-    color: 'black',
-    marginBottom: 16, // Ensure space between inputs
-  },
   passwordContainer: {
-    position: 'relative', 
+    position: 'relative', // Keep relative for absolute positioning of the eye icon
   },
   iconContainer: {
     position: 'absolute',
     right: 10,
-    top: '46%',
-    transform: [{ translateY: -12 }], // Vertically center the toggle icon
+    top: '52%', // Keep it vertically centered regardless of input height
+    transform: [{ translateY: -12 }], // Adjust to center based on icon size
+  },
+  input: {
+    height: 50, // Maintain a fixed height
+    borderWidth: 1,
+    borderColor: '#ccc',
+    borderRadius: 8,
+    paddingLeft: 10,
+    paddingRight: 40, // Space for the eye icon
+    fontSize: 16,
+    color: 'black',
+    marginBottom: 0, // Ensure space between input and error message
+  },
+  errorText: {
+    color: 'red',
+    fontSize: 14,
+    marginBottom: 11, // Space between error message and next input field
   },
   registerButton: {
     marginTop: 16,

@@ -32,7 +32,7 @@ const useFormHandler = (initialValues) => {
       // Minimum length check
       if (rule.minLength && value?.length < rule.minLength) {
         isValid = false;
-        newErrors[field] = `${field} must be at least ${rule.minLength} characters`;
+        newErrors[field] = `${field} must be at least ${rule.minLength} characters, contain at least one uppercase letter, and include one special character (@, !, #, $, &)`;
         return;
       }
 

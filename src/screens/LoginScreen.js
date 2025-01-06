@@ -194,7 +194,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   boxContainer: {
-    backgroundColor: '#ffffff',
+    backgroundColor: '#E8E8E8',
     borderRadius: 8,
     padding: 16,
     opacity: 0.8,
@@ -222,7 +222,7 @@ const styles = StyleSheet.create({
   icon2: {
     position: 'absolute',
     left: 10, // Position the email/password icon on the left
-    top: '50%',
+    top: '49%',
     transform: [{ translateY: -12 }], // Vertically center the icon
   },
   iconContainer: {
